@@ -10,6 +10,10 @@ const createRequest = async (req, res) => {
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
+
+        if(task.title !== taskName && task.category !== taskCategory && task.price !== taskPrice) {
+            return res.status(400).json({ success: false, message: 'Task values are incorrect' });
+        }
         // Create a new request
         const newRequest = new RequestPending({
             taskId,

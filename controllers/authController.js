@@ -79,7 +79,7 @@ const login = async (req, res) => {
         const token = jwt.sign(
             { id: user._id, role: user.role },
             JWT_SECRET,
-            { expiresIn: '1h' } // Token expires in 1 hour
+            { expiresIn: '7d' }
         );
 
         const role = user.role;
