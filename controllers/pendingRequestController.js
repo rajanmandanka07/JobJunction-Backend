@@ -1,33 +1,32 @@
 // controllers/requestPendingController.js
 const RequestPending = require('../models/pendingRequestModel');
+const RequestAccepted = require('../models/requestAcceptedModel');
 const Task = require('../models/taskModel');
 const User = require("../models/userModel");
 const Service = require('../models/serviceModel');
 
 const createRequest = async (req, res) => {
     try {
-        const { taskId, taskName, taskCategory, taskPrice, taskDescription, timeSlot, date, area, address } = req.body;
+        const { taskId, taskDescription, timeSlot, date, area, address } = req.body;
         // Validate that the task exists
         const task = await Task.findOne({ id: taskId });
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
 
-        if(task.title !== taskName && task.category !== taskCategory && task.price !== taskPrice) {
-            return res.status(400).json({ success: false, message: 'Task values are incorrect' });
-        }
         // Create a new request
         const newRequest = new RequestPending({
             taskId,
-            taskName,
-            taskCategory,
+            taskName : task.title,
+            taskCategory : task.category,
             taskDescription,
-            taskPrice,
+            taskPrice : task.price,
+            taskImage : task.image,
             timeSlot,
             date,
             area,
             address,
-            userId: req.user.id, // From the authenticated user
+            userId: req.user.id,
         });
 
         await newRequest.save();
@@ -39,11 +38,10 @@ const createRequest = async (req, res) => {
 
 const getPendingRequests = async (req, res) => {
     try {
-        const userId = req.user.id; // Extract user ID from token
-        const role = req.user.role; // Extract role from token
+        const userId = req.user.id;
+        const role = req.user.role;
 
         if (role === 'user') {
-            // Logic for users
             const pendingRequests = await RequestPending.find({ userId });
 
             if (!pendingRequests.length) {
@@ -52,7 +50,6 @@ const getPendingRequests = async (req, res) => {
 
             return res.status(200).json({ success: true, data: pendingRequests });
         } else if (role === 'tasker') {
-            // Fetch tasker's services
             const taskerServices = await Service.findOne({ taskerId: userId });
 
             if (!taskerServices) {
@@ -67,11 +64,20 @@ const getPendingRequests = async (req, res) => {
 
             const serviceNames = taskerServices.services.map(service => service.name);
 
-            // Fetch requests that match the tasker's area and services offered
+            // Get all requests already accepted by the tasker
+            const taskerAcceptedRequests = await RequestAccepted.find({ taskerId: userId }).select('timeSlot date');
+
+            // Exclude requests with the same `timeSlot` and `date` as existing accepted requests
+            const excludedRequestsCondition = {
+                $nor: taskerAcceptedRequests.map(({ timeSlot, date }) => ({ timeSlot, date })),
+            };
+
+            // Fetch requests that match the tasker's area, services offered, and do not have conflicting time slots
             const matchingRequests = await RequestPending.find({
                 area: taskerArea.area, // Match tasker's area
                 taskName: { $in: serviceNames }, // Match task categories to tasker's services
                 status: 'pending', // Ensure the requests are still pending
+                ...excludedRequestsCondition, // Exclude conflicting requests
             });
 
             if (!matchingRequests.length) {
