@@ -6,7 +6,7 @@ const serviceSchema = new mongoose.Schema({
     services: [
         {
             name: { type: String, required: true },
-            rate: { type: Number, required: true },
+            rate: { type: String, required: true },
         },
     ],
 });
