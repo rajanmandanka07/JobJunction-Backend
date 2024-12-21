@@ -74,10 +74,10 @@ const getPendingRequests = async (req, res) => {
 
             // Fetch requests that match the tasker's area, services offered, and do not have conflicting time slots
             const matchingRequests = await RequestPending.find({
-                area: taskerArea.area, // Match tasker's area
-                taskName: { $in: serviceNames }, // Match task categories to tasker's services
-                status: 'pending', // Ensure the requests are still pending
-                ...excludedRequestsCondition, // Exclude conflicting requests
+                area: taskerArea.area,
+                taskName: { $in: serviceNames },
+                status: 'pending',
+                ...excludedRequestsCondition,
             });
 
             if (!matchingRequests.length) {
