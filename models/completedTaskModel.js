@@ -1,7 +1,6 @@
-// models/RequestPending.js
 const mongoose = require('mongoose');
 
-const RequestPendingSchema = new mongoose.Schema({
+const CompletedTaskSchema = new mongoose.Schema({
     taskId: { type: String, required: true },
     taskTitle: { type: String, required: true },
     taskDescription: { type: String, required: true },
@@ -14,7 +13,8 @@ const RequestPendingSchema = new mongoose.Schema({
     area: { type: String, required: true },
     address: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    status: { type: String, default: 'pending' }, // Default status is pending
+    taskerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    status: { type: String, default: 'completed' }, // Default status is completed
 }, { timestamps: true });
 
-module.exports = mongoose.model('RequestPending', RequestPendingSchema);
+module.exports = mongoose.model('CompletedTask', CompletedTaskSchema);
