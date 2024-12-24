@@ -2,6 +2,7 @@ const RequestPending = require('../models/pendingRequestModel');
 const RequestAccepted = require('../models/acceptedRequestModel');
 const CompletedTask = require('../models/completedTaskModel');
 const CancelTask = require('../models/cancelTaskModel');
+const Feedback = require('../models/feedbackModel');
 const Task = require('../models/taskModel');
 const User = require("../models/userModel");
 const Service = require('../models/serviceModel');
@@ -296,4 +297,44 @@ const cancelTaskRequest = async (req, res) => {
     }
 };
 
-module.exports = { createRequest, getPendingRequests, acceptTaskRequest, completedTaskRequest, cancelTaskRequest};
+const feedback = async (req, res) => {
+    try {
+        const userId = req.user.id; // Get the user ID from the JWT payload
+        const { taskerId, taskId, rating, comments } = req.body;
+
+        // Validate input
+        if (!taskerId || !taskId || !rating) {
+            return res.status(400).json({ message: 'Tasker ID, Task ID, and Rating are required' });
+        }
+
+        // Ensure the rating is within the valid range
+        if (rating < 1 || rating > 5) {
+            return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+        }
+
+        // Check if the task exists and is completed (optional, based on your logic)
+        const completedTask = await CompletedTask.findById({_id : taskId});
+        if (!completedTask || completedTask.userId.toString() !== userId) {
+            return res.status(404).json({ message: 'Task not found or unauthorized action' });
+        }
+
+        // Create a feedback entry
+        const newFeedback = new Feedback({
+            userId,
+            taskerId,
+            taskId,
+            rating,
+            comments,
+        });
+
+        // Save the feedback to the database
+        await newFeedback.save();
+
+        res.status(201).json({ message: 'Feedback submitted successfully', feedback: newFeedback });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+module.exports = { createRequest, getPendingRequests, acceptTaskRequest, completedTaskRequest, cancelTaskRequest, feedback};
