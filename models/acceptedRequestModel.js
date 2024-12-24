@@ -13,8 +13,8 @@ const RequestAcceptedSchema = new mongoose.Schema({
     area: { type: String, required: true },
     address: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    taskerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // ID of the tasker
-    status: { type: String, default: 'accepted' }, // Default status is accepted
+    taskerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    status: { type: String, default: 'accepted' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('RequestAccepted', RequestAcceptedSchema);

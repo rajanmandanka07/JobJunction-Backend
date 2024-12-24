@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {getAllTasks, getAcceptedTask, getCompletedTasks, getCanceledTask} = require("../controllers/taskController");
+const {getAllTasks, getAcceptedTask, getCompletedTasks, getCanceledTask, getFeedBack} = require("../controllers/taskController");
 const {createRequest, getPendingRequests, acceptTaskRequest, completedTaskRequest, cancelTaskRequest, feedback } = require("../controllers/taskRequestController");
 const authenticateToken = require("../middlewares/authMiddleware");
 
@@ -18,6 +18,7 @@ router.get('/completed-task', authenticateToken, getCompletedTasks);
 router.post('/cancel-task', authenticateToken, cancelTaskRequest);
 router.get('/canceled-task', authenticateToken, getCanceledTask);
 
-router.post('/feedback', authenticateToken, feedback)
+router.post('/feedback', authenticateToken, feedback);
+router.get('/feedback', authenticateToken, getFeedBack);
 
 module.exports = router;

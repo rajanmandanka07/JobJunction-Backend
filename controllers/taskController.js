@@ -22,19 +22,18 @@ const getAllTasks = async (req, res) => {
 
 const getCompletedTasks = async (req, res) => {
     try {
-        const { userId, role } = req.body;
-
+        const { id, role } = req.user;
         // Validate inputs
-        if (!userId || !role) {
+        if (!id || !role) {
             return res.status(400).json({ message: 'UserId and role are required.' });
         }
 
         // Determine query filter based on role
         let filter = {};
         if (role === 'tasker') {
-            filter.taskerId = userId;
+            filter.taskerId = id;
         } else if (role === 'user') {
-            filter.userId = userId;
+            filter.userId = id;
         } else {
             return res.status(400).json({ message: 'Invalid role. Role must be either "user" or "tasker".' });
         }
@@ -55,19 +54,19 @@ const getCompletedTasks = async (req, res) => {
 
 const getCanceledTask = async (req, res) => {
     try {
-        const { userId, role } = req.body;
+        const { id, role } = req.user;
 
         // Validate inputs
-        if (!userId || !role) {
+        if (!id || !role) {
             return res.status(400).json({ message: 'UserId and role are required.' });
         }
 
         // Determine query filter based on role
         let filter = {};
         if (role === 'tasker') {
-            filter.taskerId = userId;
+            filter.taskerId = id;
         } else if (role === 'user') {
-            filter.userId = userId;
+            filter.userId = id;
         } else {
             return res.status(400).json({ message: 'Invalid role. Role must be either "user" or "tasker".' });
         }
@@ -88,19 +87,19 @@ const getCanceledTask = async (req, res) => {
 
 const getAcceptedTask = async (req, res) => {
     try {
-        const { userId, role } = req.body;
+        const { id, role } = req.user;
 
         // Validate inputs
-        if (!userId || !role) {
+        if (!id || !role) {
             return res.status(400).json({ message: 'UserId and role are required.' });
         }
 
         // Determine query filter based on role
         let filter = {};
         if (role === 'tasker') {
-            filter.taskerId = userId;
+            filter.taskerId = id;
         } else if (role === 'user') {
-            filter.userId = userId;
+            filter.userId = id;
         } else {
             return res.status(400).json({ message: 'Invalid role. Role must be either "user" or "tasker".' });
         }
@@ -122,7 +121,7 @@ const getAcceptedTask = async (req, res) => {
 const getFeedBack = async (req, res) => {
     try {
         const { taskId } = req.body;
-
+        console.log(taskId);
         // Validate inputs
         if (!taskId) {
             return res.status(400).json({ message: 'TaskId is required.' });
