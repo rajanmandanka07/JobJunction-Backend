@@ -84,7 +84,7 @@ const getPendingRequests = async (req, res) => {
             });
 
             if (!matchingRequests.length) {
-                return res.status(404).json({ success: false, message: 'No matching requests found' });
+                return res.status(200).json({ success: false, message: 'No matching requests found' });
             }
 
             return res.status(200).json({ success: true, data: matchingRequests });
